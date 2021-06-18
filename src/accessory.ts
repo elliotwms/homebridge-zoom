@@ -11,6 +11,7 @@ import {
   Service,
 } from 'homebridge';
 import {Server} from './server';
+import {DEFAULT_HTTP_PORT, Config} from './settings';
 
 let hap: HAP;
 
@@ -20,6 +21,7 @@ export class ZoomMeetingSwitch implements AccessoryPlugin {
   private readonly name: string;
   private switchOn = false;
   private server: Server;
+  private readonly config: Config;
 
   private readonly switchService: Service;
   private readonly informationService: Service;
@@ -27,6 +29,11 @@ export class ZoomMeetingSwitch implements AccessoryPlugin {
   constructor(log: Logging, config: AccessoryConfig, api: API) {
     this.log = log;
     this.name = config.name;
+    this.config = {
+      name: config.name ?? 'Zoom',
+      port: config.port as number ?? DEFAULT_HTTP_PORT,
+      token: config.token as string,
+    };
 
     hap = api.hap;
 
@@ -46,10 +53,14 @@ export class ZoomMeetingSwitch implements AccessoryPlugin {
       .setCharacteristic(hap.Characteristic.Manufacturer, 'Custom Manufacturer')
       .setCharacteristic(hap.Characteristic.Model, 'Custom Model');
 
-    this.server = new Server(config.port, log, (active: boolean): void => {
+    this.server = new Server(this.config.port, this.config.token, log, (active: boolean): void => {
       this.log.debug('Setting status to active: ' + active);
       this.switchService.updateCharacteristic(hap.Characteristic.On, active);
     });
+
+    if (!this.config.token) {
+      this.log.error('missing token');
+    }
 
     this.server.serve();
   }

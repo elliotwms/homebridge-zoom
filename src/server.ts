@@ -1,6 +1,6 @@
 import {Logging} from 'homebridge';
 import express, {Express, Request, Response} from 'express';
-import {DEFAULT_HTTP_PORT} from './settings';
+import {PresenceStatus, PresenceStatusUpdated} from './events/user.presence_status_updated.event';
 
 // activeStatuses reflect presence statuses which indicate the user is active on Zoom
 // https://marketplace.zoom.us/docs/api-reference/webhook-reference/user-events/presence-status-updated
@@ -10,13 +10,15 @@ export class Server {
   private readonly log: Logging;
   private readonly app: Express;
   private readonly port: number;
+  private readonly token: string;
 
   // lastStatus reflects the last status received by the webhook
   private lastStatus = '';
 
-  constructor(port: number, log: Logging, onUpdate: (bool) => void) {
+  constructor(port: number, token: string, log: Logging, onUpdate: (bool) => void) {
     this.log = log;
-    this.port = port ?? DEFAULT_HTTP_PORT;
+    this.port = port;
+    this.token = token;
 
     this.app = express()
       .use(express.json())
@@ -24,14 +26,29 @@ export class Server {
         this.log('GET: ' + req.url);
         res.send('homebridge-zoom is running');
       })
-      .post('/', (req: Request, res: Response) => {
-        this.log(req.body);
+      .post('/', this.handler(onUpdate));
+  }
 
-        this.log('Received user presence: ' + req.body.payload.object.presence_status);
-        res.send();
+  private handler(onUpdate: (bool) => void) {
+    return (req: Request, res: Response) => {
+      if (req.headers.authorization !== this.token) {
+        res.sendStatus(401);
+        return;
+      }
 
-        this.checkStatus(req.body.payload.object.presence_status, onUpdate);
-      });
+      const body = req.body as PresenceStatusUpdated;
+
+      if (!body.payload?.object?.presence_status) {
+        res.sendStatus(400);
+        return;
+      }
+
+      res.sendStatus(200);
+
+      this.log('Received user presence: ' + body.payload.object.presence_status);
+
+      this.checkStatus(body.payload.object.presence_status, onUpdate);
+    };
   }
 
   serve(): void {
@@ -41,7 +58,7 @@ export class Server {
   }
 
   // checkStatus checks whether the status received should notify the callback in the event of a change in activity
-  checkStatus(status: string, onUpdate: (state: boolean) => void): void {
+  checkStatus(status: PresenceStatus, onUpdate: (state: boolean) => void): void {
     const
       isActive = activeStatuses.includes(status),
       wasActive = activeStatuses.includes(this.lastStatus);

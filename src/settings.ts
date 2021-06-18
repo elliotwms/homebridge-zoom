@@ -7,3 +7,9 @@ export const PLATFORM_NAME = 'Zoom';
  * This is the default port the webhook endpoint will listen on
  */
 export const DEFAULT_HTTP_PORT = 9666;
+
+export interface Config {
+  name: string;
+  port: number;
+  token: string;
+}

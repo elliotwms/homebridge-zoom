@@ -11,10 +11,16 @@
         "required": true,
         "default": "Zoom"
       },
+      "token": {
+        "title": "Token",
+        "type": "string",
+        "required": true
+      },
       "port": {
         "title": "Port",
         "type": "number",
-        "placeholder": 9666
+        "default": 9666,
+        "required": true
       }
     }
   }

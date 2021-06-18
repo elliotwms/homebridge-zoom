@@ -1,0 +1,57 @@
+{
+  "title": "Presence Status Updated",
+  "type": "object",
+  "properties": {
+    "event": {
+      "type": "string",
+      "description": "Name of the event. "
+    },
+    "event_ts": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Timestamp (in milliseconds since epcoch) at which the event occured. The value of this field is returned in long(int64) format."
+    },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "type": "string",
+          "description": "The Account ID of the user."
+        },
+        "object": {
+          "type": "object",
+          "properties": {
+            "date_time": {
+              "type": "string",
+              "description": "The date and time at which the user signed in.",
+              "format": "date-time"
+            },
+            "email": {
+              "type": "string",
+              "description": "Email address of the user whose presence status was updated.",
+              "format": "email"
+            },
+            "id": {
+              "type": "string",
+              "description": "User ID of the user whose presence status was updated."
+            },
+            "presence_status": {
+              "title": "Presence status",
+              "type": "string",
+              "description": "Presence status. The value can be one of these: `Available`, `Away`, `Do_Not_Disturb`, `In_Meeting`, `Presenting`, `On_Phone_Call` and `In_Calendar_Event`.",
+              "enum": [
+                "Available",
+                "Away",
+                "Do_Not_Disturb",
+                "In_Meeting",
+                "Presenting",
+                "On_Phone_Call",
+                "In_Calendar_Event"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}
