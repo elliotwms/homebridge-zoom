@@ -20,6 +20,10 @@ export class Server {
 
     this.app = express()
       .use(express.json())
+      .get('/', (req: Request, res: Response) => {
+        this.log('GET: ' + req.url);
+        res.send('homebridge-zoom is running');
+      })
       .post('/', (req: Request, res: Response) => {
         this.log(req.body);
 
