@@ -21,6 +21,11 @@
         "type": "number",
         "default": 9666,
         "required": true
+      },
+      "userID": {
+        "title": "User ID",
+        "type": "string",
+        "required": true
       }
     }
   }

@@ -14,11 +14,15 @@ export class Server {
 
   // lastStatus reflects the last status received by the webhook
   private lastStatus = '';
+  private userID: string;
 
-  constructor(port: number, token: string, log: Logging, onUpdate: (bool) => void) {
+  constructor(port: number, token, userID: string, log: Logging, onUpdate: (bool) => void) {
     this.log = log;
     this.port = port;
     this.token = token;
+    this.userID = userID;
+
+    this.log.debug(port.toString(), token, userID);
 
     this.app = express()
       .use(express.json())
@@ -32,22 +36,31 @@ export class Server {
   private handler(onUpdate: (bool) => void) {
     return (req: Request, res: Response) => {
       if (req.headers.authorization !== this.token) {
+        this.log.debug('Invalid token: ' + req.headers.authorization);
         res.sendStatus(401);
         return;
       }
 
       const body = req.body as PresenceStatusUpdated;
 
-      if (!body.payload?.object?.presence_status) {
+      const id = body.payload?.object?.id;
+      if (this.userID !== '' && id !== this.userID) {
+        this.log.debug('Ignoring update for user ID', id);
+        res.sendStatus(200);
+        return;
+      }
+
+      const status = body.payload?.object?.presence_status;
+      if (!status) {
         res.sendStatus(400);
         return;
       }
 
       res.sendStatus(200);
 
-      this.log('Received user presence: ' + body.payload.object.presence_status);
+      this.log.debug('Presence update received. User ID:', id, 'Status:', status);
 
-      this.checkStatus(body.payload.object.presence_status, onUpdate);
+      this.checkStatus(status, onUpdate);
     };
   }
 
