@@ -7,23 +7,27 @@
     "properties": {
       "name": {
         "title": "Name",
+        "description": "Accessory name",
         "type": "string",
         "required": true,
         "default": "Zoom"
       },
       "token": {
         "title": "Token",
+        "description": "Zoom verification token",
         "type": "string",
         "required": true
       },
       "port": {
         "title": "Port",
+        "description": "Webhook port",
         "type": "number",
         "default": 9666,
         "required": true
       },
       "userIDs": {
         "title": "User IDs",
+        "description": "Filter events for only these IDs",
         "type": "array",
         "required": false,
         "items": {
