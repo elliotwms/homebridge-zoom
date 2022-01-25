@@ -44,7 +44,7 @@ export class Server {
       const body = req.body as PresenceStatusUpdated;
 
       const id = body.payload?.object?.id;
-      if (this.userIDs.length > 0 && this.userIDs.includes(id as string)) {
+      if (this.userIDs.length > 0 && !this.userIDs.includes(id as string)) {
         this.log.debug('Ignoring update for user ID', id);
         res.sendStatus(200);
         return;
