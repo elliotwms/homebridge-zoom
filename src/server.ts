@@ -14,15 +14,15 @@ export class Server {
 
   // lastStatus reflects the last status received by the webhook
   private lastStatus = '';
-  private userID: string;
+  private userIDs: string[];
 
-  constructor(port: number, token, userID: string, log: Logging, onUpdate: (bool) => void) {
+  constructor(port: number, token: string, userIDs: string[], log: Logging, onUpdate: (bool) => void) {
     this.log = log;
     this.port = port;
     this.token = token;
-    this.userID = userID;
+    this.userIDs = userIDs;
 
-    this.log.debug(port.toString(), token, userID);
+    this.log.debug(port.toString(), token, userIDs);
 
     this.app = express()
       .use(express.json())
@@ -44,7 +44,7 @@ export class Server {
       const body = req.body as PresenceStatusUpdated;
 
       const id = body.payload?.object?.id;
-      if (this.userID !== '' && id !== this.userID) {
+      if (this.userIDs.length > 0 && this.userIDs.includes(id as string)) {
         this.log.debug('Ignoring update for user ID', id);
         res.sendStatus(200);
         return;

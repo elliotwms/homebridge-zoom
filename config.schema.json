@@ -22,10 +22,14 @@
         "default": 9666,
         "required": true
       },
-      "userID": {
-        "title": "User ID",
-        "type": "string",
-        "required": true
+      "userIDs": {
+        "title": "User IDs",
+        "type": "array",
+        "required": false,
+        "items": {
+          "title": "User ID",
+          "type": "string"
+        }
       }
     }
   }

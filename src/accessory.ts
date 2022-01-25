@@ -33,7 +33,7 @@ export class ZoomMeetingSwitch implements AccessoryPlugin {
       name: config.name ?? 'Zoom',
       port: config.port as number ?? DEFAULT_HTTP_PORT,
       token: config.token as string,
-      userID: config.userID as string,
+      userIDs: config.userIDs as string[],
     };
 
     hap = api.hap;
@@ -54,7 +54,7 @@ export class ZoomMeetingSwitch implements AccessoryPlugin {
       .setCharacteristic(hap.Characteristic.Manufacturer, 'Custom Manufacturer')
       .setCharacteristic(hap.Characteristic.Model, 'Custom Model');
 
-    this.server = new Server(this.config.port, this.config.token, this.config.userID, log, (active: boolean): void => {
+    this.server = new Server(this.config.port, this.config.token, this.config.userIDs, log, (active: boolean): void => {
       this.log.debug('Setting status to active: ' + active);
       this.switchService.updateCharacteristic(hap.Characteristic.On, active);
     });

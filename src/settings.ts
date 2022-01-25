@@ -12,5 +12,5 @@ export interface Config {
   name: string;
   port: number;
   token: string;
-  userID: string;
+  userIDs: string[];
 }
